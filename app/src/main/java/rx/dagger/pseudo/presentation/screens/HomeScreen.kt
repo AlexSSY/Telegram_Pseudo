@@ -1,4 +1,4 @@
-package rx.dagger.pseudo
+package rx.dagger.pseudo.presentation.screens
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import rx.dagger.pseudo.ui.theme.TelegramPseudoTheme
+import rx.dagger.pseudo.AppTopBar
 
 @Composable
 fun HomeScreen() {

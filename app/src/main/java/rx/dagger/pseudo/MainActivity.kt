@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import rx.dagger.pseudo.ui.theme.TelegramPseudoTheme
 import org.drinkless.tdlib.Client;
+import rx.dagger.pseudo.presentation.screens.AddAccountScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +39,7 @@ class MainActivity : ComponentActivity() {
             TelegramPseudoTheme(
                 darkTheme = true
             ) {
-                HomeScreen()
+                AddAccountScreen()
             }
         }
     }

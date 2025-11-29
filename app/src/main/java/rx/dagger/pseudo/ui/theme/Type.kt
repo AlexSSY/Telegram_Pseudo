@@ -22,13 +22,18 @@ val Typography = Typography(
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
-    /* Other default text styles to override
+    labelMedium = TextStyle(
+        fontFamily = OpenSans,
+        fontWeight = FontWeight.Normal,
+        fontSize = 20.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.sp
+    ),
     labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = OpenSans,
         fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
+        fontSize = 15.sp,
+        lineHeight = 18.sp,
         letterSpacing = 0.5.sp
     )
-    */
 )
