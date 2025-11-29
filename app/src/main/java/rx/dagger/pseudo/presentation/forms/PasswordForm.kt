@@ -9,31 +9,32 @@ import androidx.compose.runtime.setValue
 import rx.dagger.pseudo.Proto
 import rx.dagger.pseudo.presentation.CodeInput
 import rx.dagger.pseudo.presentation.FormButton
+import rx.dagger.pseudo.presentation.PasswordInput
 
 @Composable
 fun PasswordForm(
     protoViewModel: Proto,
     onBackClick: (callback: () -> Unit) -> Unit
 ) {
-    var code by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var loading = protoViewModel.loading.collectAsState()
     var error = protoViewModel.error.collectAsState()
 
     FormSkeleton(
-        title = "+1 123 456789",
-        subTitle = "Если Вы используете приложение на других устройтвах, код для вохода был отправлен через Telegram.",
+        title = "2FA Пароль",
+        subTitle = "Введите пароль от вашего аккаунта Telegram.",
     ) {
-        CodeInput(
-            value = code,
+        PasswordInput(
+            value = password,
             error = error.value,
-            onValueChange = { code = it },
+            onValueChange = { password = it },
             enabled = !loading.value
         )
         FormButton(
             enabled = !loading.value,
             text =  "Продолжить",
             onClick = {
-                protoViewModel.sendCode(code)
+                protoViewModel.sendPassword(password)
             }
         )
     }

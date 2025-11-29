@@ -17,6 +17,7 @@ import rx.dagger.pseudo.AppTopBar
 import rx.dagger.pseudo.Proto
 import rx.dagger.pseudo.ProtoFormVisibilityState
 import rx.dagger.pseudo.presentation.forms.CodeForm
+import rx.dagger.pseudo.presentation.forms.PasswordForm
 import rx.dagger.pseudo.presentation.forms.PhoneForm
 
 @Composable
@@ -55,7 +56,11 @@ fun AddAccountScreen() {
                         protoViewModel = protoViewModel
                     ) { }
                 }
-                ProtoFormVisibilityState.PASSWORD -> TODO()
+                ProtoFormVisibilityState.PASSWORD -> {
+                    PasswordForm(
+                        protoViewModel = protoViewModel
+                    ) { }
+                }
             }
         }
     }

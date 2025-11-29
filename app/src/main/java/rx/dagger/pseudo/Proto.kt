@@ -71,4 +71,19 @@ class Proto : ViewModel() {
             _loading.value = false
         }
     }
+
+    fun sendPassword(password: String) {
+        _error.value = null
+
+        if (password.isEmpty()) {
+            _error.value = "Поле не может быть пустым"
+            return
+        }
+
+        viewModelScope.launch {
+            _loading.value = true
+            _error.value = protoSendAnything(ProtoFormVisibilityState.PHONE)
+            _loading.value = false
+        }
+    }
 }
