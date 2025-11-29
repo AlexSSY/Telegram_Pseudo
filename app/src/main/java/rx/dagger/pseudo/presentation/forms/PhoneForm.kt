@@ -23,11 +23,11 @@ import rx.dagger.pseudo.presentation.CountrySelect
 import rx.dagger.pseudo.presentation.CountrySelectOverlay
 import rx.dagger.pseudo.presentation.FormButton
 import rx.dagger.pseudo.presentation.PhoneInput
-import rx.dagger.pseudo.protoSendAnything
 
 @Composable
 fun PhoneForm(
-    onBackClick: (callback: () -> Unit) -> Unit
+    onBackClick: (callback: () -> Unit) -> Unit,
+    onSubmit: (String) -> Unit
 ) {
     var phoneCode by remember { mutableStateOf("380") }
     var phoneNumber by remember { mutableStateOf("") }
@@ -61,6 +61,7 @@ fun PhoneForm(
         CountrySelect(!loading, countryName, { countrySelectOpened = true })
         PhoneInput(
             enabled = !loading,
+            error = error,
             codeValue = phoneCode,
             onCodeValueChange = {
                 phoneCode = it.trim()
@@ -80,13 +81,12 @@ fun PhoneForm(
             onClick = {
                 error = null
 
-                TODO("impl pre-validation")
-
-                scope.launch {
-                    loading = true
-                    protoSendAnything(ProtoFormVisibilityState.CODE)
-                    loading = false
+                if (phoneCode.isEmpty() || phoneNumber.isEmpty()) {
+                    error = "Поле не может быть пустым"
+                    return@FormButton
                 }
+
+                onSubmit(phoneCode + phoneNumber)
             }
         )
     }

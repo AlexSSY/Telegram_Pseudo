@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -117,45 +118,61 @@ fun textFieldColorScheme(): TextFieldColors {
 @Composable
 fun PhoneInput(
     enabled: Boolean = true,
+    error: String? = null,
     codeValue: String,
     onCodeValueChange: (String) -> Unit,
     phoneValue: String,
     onPhoneValueChange: (String) -> Unit
 ) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(24.dp)
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        TextField(
-            value = codeValue,
-            prefix = { Text("+") },
-            singleLine = true,
-            onValueChange = { newValue ->
-                val filtered = newValue
-                    .trim()
-                    .replace(" ", "")
-                    .takeWhile { it.isDigit() }
-                onCodeValueChange(filtered)
-            },
-            colors = textFieldColorScheme(),
-            enabled = enabled,
-            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-            modifier = Modifier.width(100.dp)
-        )
-        TextField(
-            value = phoneValue,
-            singleLine = true,
-            onValueChange = { newValue ->
-                val filtered = newValue
-                    .trim()
-                    .replace(" ", "")
-                    .takeWhile { it.isDigit() }
-                onPhoneValueChange(filtered)
-            },
-            colors = textFieldColorScheme(),
-            enabled = enabled,
-            placeholder = { Text("-- ------ -- --", color = Color(0x41FFFFFF)) },
-            modifier = Modifier.fillMaxWidth()
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            TextField(
+                value = codeValue,
+                prefix = { Text("+") },
+                singleLine = true,
+                isError = error != null,
+                onValueChange = { newValue ->
+                    val filtered = newValue
+                        .trim()
+                        .replace(" ", "")
+                        .takeWhile { it.isDigit() }
+                    onCodeValueChange(filtered)
+                },
+                colors = textFieldColorScheme(),
+                enabled = enabled,
+                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                modifier = Modifier.width(100.dp)
+            )
+            TextField(
+                value = phoneValue,
+                singleLine = true,
+                isError = error != null,
+                onValueChange = { newValue ->
+                    val filtered = newValue
+                        .trim()
+                        .replace(" ", "")
+                        .takeWhile { it.isDigit() }
+                    onPhoneValueChange(filtered)
+                },
+                colors = textFieldColorScheme(),
+                enabled = enabled,
+                placeholder = { Text("-- ------ -- --", color = Color(0x41FFFFFF)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        Row() {
+            if (error != null) {
+                Text(
+                    text = error,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
     }
 }
 
