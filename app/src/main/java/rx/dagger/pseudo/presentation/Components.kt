@@ -242,3 +242,39 @@ fun CountrySelectOverlay(
         }
     }
 }
+
+@Composable
+fun CodeInput(
+    value: String,
+    error: String?,
+    onValueChange: (String) -> Unit,
+    enabled: Boolean = true
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        TextField(
+            value = value,
+            singleLine = true,
+            isError = error != null,
+            onValueChange = { newValue ->
+                val filtered = newValue
+                    .trim()
+                    .replace(" ", "")
+                    .takeWhile { it.isDigit() }
+                onValueChange(filtered)
+            },
+            colors = textFieldColorScheme(),
+            enabled = enabled,
+            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+            modifier = Modifier.fillMaxWidth()
+        )
+        if (error != null) {
+            Text(
+                text = error,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+    }
+}

@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import rx.dagger.pseudo.AppTopBar
 import rx.dagger.pseudo.Proto
 import rx.dagger.pseudo.ProtoFormVisibilityState
-import rx.dagger.pseudo.currentVisibility
+import rx.dagger.pseudo.presentation.forms.CodeForm
 import rx.dagger.pseudo.presentation.forms.PhoneForm
 
 @Composable
@@ -43,15 +43,18 @@ fun AddAccountScreen() {
         ) {
             when (currentVisibility.value) {
                 ProtoFormVisibilityState.PHONE -> {
-                    PhoneForm({
+                    PhoneForm(protoViewModel,
+                        {
                         onBackClick = it
                     }, {
-                            loading = true
-                            protoSendAnything(ProtoFormVisibilityState.CODE)
-                            loading = false
+
                     })
                 }
-                ProtoFormVisibilityState.CODE -> TODO()
+                ProtoFormVisibilityState.CODE -> {
+                    CodeForm(
+                        protoViewModel = protoViewModel
+                    ) { }
+                }
                 ProtoFormVisibilityState.PASSWORD -> TODO()
             }
         }
