@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
         var keepOnScreen by mutableStateOf(true)
         splashScreen.setKeepOnScreenCondition { keepOnScreen }
         lifecycleScope.launch {
-            delay(15000L)
+            delay(1500L)
             keepOnScreen = false
         }
         super.onCreate(savedInstanceState)
