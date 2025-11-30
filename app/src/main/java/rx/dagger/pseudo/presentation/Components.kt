@@ -92,7 +92,7 @@ fun CountrySelect(
     ) {
         Text(
             text = countryName,
-            style = MaterialTheme.typography.labelMedium.copy(color = textColor)
+            style = MaterialTheme.typography.labelSmall.copy(color = textColor)
         )
         Icon(
             painter = painterResource(R.drawable.ic_caret_down),
@@ -165,7 +165,6 @@ fun PhoneInput(
                 colors = textFieldColorScheme(),
                 enabled = enabled,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                placeholder = { Text("-- ------ -- --", color = Color(0x41FFFFFF)) },
                 modifier = Modifier.fillMaxWidth()
             )
         }

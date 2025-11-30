@@ -26,12 +26,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import rx.dagger.pseudo.ui.theme.TelegramPseudoTheme
 import org.drinkless.tdlib.Client;
 import rx.dagger.pseudo.presentation.screens.AddAccountScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+        var keepOnScreen by mutableStateOf(true)
+        splashScreen.setKeepOnScreenCondition { keepOnScreen }
+        lifecycleScope.launch {
+            delay(15000L)
+            keepOnScreen = false
+        }
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()

@@ -94,7 +94,7 @@ fun FormSkeleton(
     content: @Composable () -> Unit
 ) {
     Column(
-        modifier = Modifier.padding(60.dp, 0.dp),
+        modifier = Modifier.padding(30.dp, 0.dp),
         verticalArrangement = Arrangement.spacedBy(40.dp)
     ) {
         Column(
