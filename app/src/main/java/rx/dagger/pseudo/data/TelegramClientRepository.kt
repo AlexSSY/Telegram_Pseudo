@@ -1,19 +1,39 @@
 package rx.dagger.pseudo.data
 
+import android.content.Context
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import rx.dagger.pseudo.App
 
-class TelegramClientRepository {
+class TelegramClientRepository(
+    private val context: Context
+) {
     private val telegramClientsFlow = MutableStateFlow<List<TelegramClient>>(emptyList())
     val telegramClients = telegramClientsFlow.asStateFlow()
 
+    private val db = (context as App).database
+    private val accountDao = db.telegramAccountDao()
+
     init {
-        // here is load list of databaseDirs from SQLite DB
-        // and initialize against each of them instance of TelegramClient
-        // and add instance to teleggramClientsFlow
+        CoroutineScope(Dispatchers.IO).launch {
+            accountDao.getAllAccountsFlow().collect { accounts ->
+                val clients = accounts.map { entity ->
+                    TelegramClient(databaseDirectory = entity.databaseDirectory)
+                }
+                telegramClientsFlow.value = clients
+            }
+        }
     }
 
-    fun save(telegramClient: TelegramClient) {
+    suspend fun save(telegramClient: TelegramClient) {
         val dbDataToSave = telegramClient.databaseDirectorySafe
+        accountDao.insert(
+            TelegramAccountEntity(
+                databaseDirectory = dbDataToSave
+            )
+        )
     }
 }

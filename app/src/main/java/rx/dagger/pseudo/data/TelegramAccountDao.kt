@@ -4,24 +4,25 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TelegramAccountDao {
     @Query("SELECT * FROM telegramaccountentity")
-    fun getAll(): List<TelegramAccountEntity>
+    fun getAllAccountsFlow(): Flow<List<TelegramAccountEntity>>
 
     @Query("SELECT * FROM telegramaccountentity WHERE database_directory LIKE :databaseDirectory LIMIT 1")
-    fun findByDatabaseDirectory(databaseDirectory: String): TelegramAccountEntity
+    fun findByDatabaseDirectoryFlow(databaseDirectory: String): Flow<TelegramAccountEntity>
 
     @Query("SELECT database_directory FROM telegramaccountentity")
-    fun getAllDatabaseDirectories(): List<String>
+    fun getAllDatabaseDirectoriesFlow(): Flow<List<String>>
 
     @Insert
-    fun insert(tgEntity: TelegramAccountEntity)
+    suspend fun insert(tgEntity: TelegramAccountEntity)
 
     @Insert
-    fun insertAll(vararg tgEntities: TelegramAccountEntity)
+    suspend fun insertAll(vararg tgEntities: TelegramAccountEntity)
 
     @Delete
-    fun delete(tgEntity: TelegramAccountEntity)
+    suspend fun delete(tgEntity: TelegramAccountEntity)
 }

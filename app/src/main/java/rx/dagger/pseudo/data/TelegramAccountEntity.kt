@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class TelegramAccountEntity(
-    @PrimaryKey val uid: Int,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     @ColumnInfo(name = "database_directory") val databaseDirectory: String,
 )

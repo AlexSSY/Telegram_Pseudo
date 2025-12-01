@@ -18,5 +18,5 @@ abstract class AppDatabase: RoomDatabase() {
         }
     }
 
-    abstract fun tgDao(): TelegramAccountDao
+    abstract fun telegramAccountDao(): TelegramAccountDao
 }
