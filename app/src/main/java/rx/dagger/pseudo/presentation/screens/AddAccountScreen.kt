@@ -19,9 +19,12 @@ import rx.dagger.pseudo.ProtoFormVisibilityState
 import rx.dagger.pseudo.presentation.forms.CodeForm
 import rx.dagger.pseudo.presentation.forms.PasswordForm
 import rx.dagger.pseudo.presentation.forms.PhoneForm
+import rx.dagger.pseudo.viewmodel.AddAccountViewModel
 
 @Composable
-fun AddAccountScreen() {
+fun AddAccountScreen(
+    viewModel: AddAccountViewModel
+) {
     var onBackClick: (() -> Unit)? = remember { null }
     val protoViewModel = remember { Proto() }
     val currentVisibility = protoViewModel.currentVisibility.collectAsState()

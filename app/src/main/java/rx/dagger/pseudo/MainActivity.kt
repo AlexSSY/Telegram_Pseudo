@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -33,6 +34,8 @@ import kotlinx.coroutines.launch
 import rx.dagger.pseudo.ui.theme.TelegramPseudoTheme
 import org.drinkless.tdlib.Client;
 import rx.dagger.pseudo.presentation.screens.AddAccountScreen
+import rx.dagger.pseudo.viewmodel.AddAccountViewModel
+import rx.dagger.pseudo.viewmodel.AddAccountViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,12 +48,19 @@ class MainActivity : ComponentActivity() {
         }
         super.onCreate(savedInstanceState)
 
+        val app = application as App
+        val repo = app.telegramClientRepository
+
+        val viewModel: AddAccountViewModel by viewModels {
+            AddAccountViewModelFactory(repo)
+        }
+
         enableEdgeToEdge()
         setContent {
             TelegramPseudoTheme(
                 darkTheme = true
             ) {
-                AddAccountScreen()
+                AddAccountScreen(viewModel)
             }
         }
     }
