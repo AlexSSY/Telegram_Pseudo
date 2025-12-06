@@ -1,12 +1,17 @@
 package rx.dagger.pseudo.data
 
+import android.os.Build
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.drinkless.tdlib.Client
 import org.drinkless.tdlib.TdApi
+import kotlin.coroutines.resume
+import kotlin.text.trim
 
 class TelegramClient(
-    private val databaseDirectory: String?
+    private val databaseDirectory: String
 ) {
     companion object {
         fun error(message: String) {
@@ -14,11 +19,8 @@ class TelegramClient(
         }
     }
 
-    private val resolvedDatabaseDirectory: String =
-        databaseDirectory ?: System.currentTimeMillis().toString()
-
     val databaseDirectorySafe: String
-        get() = resolvedDatabaseDirectory
+        get() = databaseDirectory
 
     private val client = Client.create(
         { updateHandler(it) },
@@ -45,11 +47,34 @@ class TelegramClient(
         }
     }
 
+    var onAuthorizedCallback: (() -> Unit)? = null
+
     private fun onAuthorizationStateUpdated(authorizationState: TdApi.AuthorizationState) {
         authorizationStateFlow.value = authorizationState
 
         when (authorizationState.constructor) {
+            TdApi.AuthorizationStateWaitTdlibParameters.CONSTRUCTOR -> {
+                val request = TdApi.SetTdlibParameters()
+                request.databaseDirectory = databaseDirectorySafe
+                request.apiId = 11721693
+                request.apiHash = "e412ffeed9408ed2f3525736cf579ebf"
+                request.applicationVersion = "0.1b"
+                request.systemLanguageCode = "ru"
+                request.deviceModel = Build.MODEL
+                client.send(request, { obj ->
+                    when (obj.constructor) {
+                        TdApi.Ok.CONSTRUCTOR -> {
+
+                        }
+                        TdApi.Error.CONSTRUCTOR -> {
+                            val error = obj as TdApi.Error
+                            error("SetTdlibParameters: $error")
+                        }
+                    }
+                })
+            }
             TdApi.AuthorizationStateReady.CONSTRUCTOR -> {
+                onAuthorizedCallback?.invoke()
                 client.send(TdApi.GetMe(), { obj ->
                     when (obj.constructor) {
                         TdApi.User.CONSTRUCTOR -> {
@@ -78,5 +103,97 @@ class TelegramClient(
     private fun defaultExceptionHandler(exception: Throwable) {
         val message = exception.message ?: "unknown"
         error("Default: $message")
+    }
+
+    private fun mapTdError(error: TdApi.Error): TelegramError =
+        when {
+            error.message.contains("PHONE_CODE_INVALID", ignoreCase = true) ->
+                TelegramError.InvalidPhoneNumber
+
+            error.message.contains("PHONE_NUMBER_INVALID", ignoreCase = true) ->
+                TelegramError.InvalidPhoneNumber
+
+            error.message.startsWith("FLOOD_WAIT_") ->
+                TelegramError.FloodWait(
+                    error.message.substringAfter("FLOOD_WAIT_").toInt()
+                )
+
+            error.message.startsWith("Too Many Requests:") ->
+                TelegramError.FloodWait(
+                    error.message.substringAfter("Too Many Requests: retry after ").toInt()
+                )
+
+            else ->
+                TelegramError.Unknown(error.code, error.message)
+        }
+
+    private fun requestHandler(
+        cont: CancellableContinuation<TelegramResult<Unit>>
+    ): (obj: TdApi.Object) -> Unit {
+        return { obj ->
+            when (obj.constructor) {
+                TdApi.Error.CONSTRUCTOR -> {
+                    val error = obj as TdApi.Error
+                    cont.resume(
+                        TelegramResult.Failure(
+                            mapTdError(error)
+                        )
+                    )
+                }
+                TdApi.Ok.CONSTRUCTOR -> {
+                    cont.resume(
+                        TelegramResult.Success(Unit)
+                    )
+                }
+            }
+        }
+    }
+
+    suspend fun sendPhoneNumber(
+        phoneNumber: String
+    ): TelegramResult<Unit> = suspendCancellableCoroutine { cont ->
+        val phoneNumber = phoneNumber.trim()
+
+        if (phoneNumber.isEmpty()) {
+            cont.resume(
+                TelegramResult.Failure(TelegramError.Empty)
+            )
+            return@suspendCancellableCoroutine
+        }
+
+        val request = TdApi.SetAuthenticationPhoneNumber(phoneNumber, null)
+        client.send(request, requestHandler(cont))
+    }
+
+    suspend fun sendVerificationCode(
+        code: String
+    ): TelegramResult<Unit> = suspendCancellableCoroutine { cont ->
+        val code = code.trim()
+
+        if (code.isEmpty()) {
+            cont.resume(
+                TelegramResult.Failure(TelegramError.Empty)
+            )
+            return@suspendCancellableCoroutine
+        }
+
+        val request = TdApi.CheckAuthenticationCode(code)
+        client.send(request, requestHandler(cont))
+    }
+
+    suspend fun sendPassword(
+        password: String
+    ): TelegramResult<Unit> = suspendCancellableCoroutine { cont ->
+        val password = password.trim()
+
+        if (password.isEmpty()) {
+            cont.resume(
+                TelegramResult.Failure(TelegramError.Empty)
+            )
+            return@suspendCancellableCoroutine
+        }
+
+        val request = TdApi.CheckAuthenticationPassword(password)
+        client.send(request, requestHandler(cont))
     }
 }

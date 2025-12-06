@@ -10,15 +10,16 @@ import rx.dagger.pseudo.Proto
 import rx.dagger.pseudo.presentation.CodeInput
 import rx.dagger.pseudo.presentation.FormButton
 import rx.dagger.pseudo.presentation.PasswordInput
+import rx.dagger.pseudo.viewmodel.AddAccountViewModel
 
 @Composable
 fun PasswordForm(
-    protoViewModel: Proto,
+    viewModel: AddAccountViewModel,
     onBackClick: (callback: () -> Unit) -> Unit
 ) {
     var password by remember { mutableStateOf("") }
-    var loading = protoViewModel.loading.collectAsState()
-    var error = protoViewModel.error.collectAsState()
+    var loading = viewModel.loadingSafe.collectAsState()
+    var error = viewModel.errorSafe.collectAsState()
 
     FormSkeleton(
         title = "2FA Пароль",
@@ -34,7 +35,7 @@ fun PasswordForm(
             enabled = !loading.value,
             text =  "Продолжить",
             onClick = {
-                protoViewModel.sendPassword(password)
+                viewModel.sendPassword(password)
             }
         )
     }

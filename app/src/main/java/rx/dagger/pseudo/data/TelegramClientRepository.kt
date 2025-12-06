@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import rx.dagger.pseudo.App
+import java.io.File
 
 class TelegramClientRepository(
     private val context: Context
@@ -26,6 +27,14 @@ class TelegramClientRepository(
                 telegramClientsFlow.value = clients
             }
         }
+    }
+
+    fun createTelegramClient(): TelegramClient {
+        val name = System.currentTimeMillis().toString()
+        val dir = File(context.filesDir, "td_$name")
+        dir.mkdirs()
+
+        return TelegramClient(dir.absolutePath)
     }
 
     suspend fun save(telegramClient: TelegramClient) {

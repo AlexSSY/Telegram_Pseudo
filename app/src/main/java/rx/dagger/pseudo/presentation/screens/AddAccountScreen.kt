@@ -1,11 +1,14 @@
 package rx.dagger.pseudo.presentation.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
@@ -13,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import org.drinkless.tdlib.TdApi
 import rx.dagger.pseudo.AppTopBar
 import rx.dagger.pseudo.Proto
 import rx.dagger.pseudo.ProtoFormVisibilityState
@@ -28,6 +32,7 @@ fun AddAccountScreen(
     var onBackClick: (() -> Unit)? = remember { null }
     val protoViewModel = remember { Proto() }
     val currentVisibility = protoViewModel.currentVisibility.collectAsState()
+    val authorizationState = viewModel.telegramClient.authorizationState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -45,24 +50,25 @@ fun AddAccountScreen(
                 .padding(innerPadding),
             contentAlignment = Alignment.Center
         ) {
-            when (currentVisibility.value) {
-                ProtoFormVisibilityState.PHONE -> {
-                    PhoneForm(protoViewModel,
-                        {
-                        onBackClick = it
-                    }, {
-
-                    })
+            when (authorizationState.value?.constructor) {
+                TdApi.AuthorizationStateWaitPhoneNumber.CONSTRUCTOR -> {
+                    PhoneForm(
+                        viewModel,
+                        { onBackClick = it }
+                    )
                 }
-                ProtoFormVisibilityState.CODE -> {
+                TdApi.AuthorizationStateWaitCode.CONSTRUCTOR -> {
                     CodeForm(
-                        protoViewModel = protoViewModel
+                        viewModel
                     ) { }
                 }
-                ProtoFormVisibilityState.PASSWORD -> {
+                TdApi.AuthorizationStateWaitPassword.CONSTRUCTOR -> {
                     PasswordForm(
-                        protoViewModel = protoViewModel
+                        viewModel
                     ) { }
+                }
+                else -> {
+                    CircularProgressIndicator()
                 }
             }
         }

@@ -25,20 +25,19 @@ import rx.dagger.pseudo.presentation.CountrySelect
 import rx.dagger.pseudo.presentation.CountrySelectOverlay
 import rx.dagger.pseudo.presentation.FormButton
 import rx.dagger.pseudo.presentation.PhoneInput
+import rx.dagger.pseudo.viewmodel.AddAccountViewModel
 
 @Composable
 fun PhoneForm(
-    protoViewModel: Proto,
-    onBackClick: (callback: () -> Unit) -> Unit,
-    onSubmit: (String) -> Unit
+    viewModel: AddAccountViewModel,
+    onBackClick: (callback: () -> Unit) -> Unit
 ) {
     var phoneCode by remember { mutableStateOf("380") }
     var phoneNumber by remember { mutableStateOf("") }
     var countryName by remember { mutableStateOf("Украина") }
     var countrySelectOpened by remember { mutableStateOf(false) }
-    var loading = protoViewModel.loading.collectAsState()
-    var error = protoViewModel.error.collectAsState()
-    val scope = rememberCoroutineScope()
+    val loading = viewModel.loadingSafe.collectAsState()
+    val error = viewModel.errorSafe.collectAsState()
 
     onBackClick({
         countrySelectOpened = false
@@ -71,8 +70,7 @@ fun PhoneForm(
             enabled = !loading.value,
             text = "Продолжить",
             onClick = {
-                protoViewModel.sendPhone(phoneCode, phoneNumber)
-                onSubmit(phoneCode + phoneNumber)
+                viewModel.sendPhoneNumber(phoneCode, phoneNumber)
             }
         )
     }

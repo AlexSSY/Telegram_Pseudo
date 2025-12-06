@@ -9,15 +9,16 @@ import androidx.compose.runtime.setValue
 import rx.dagger.pseudo.Proto
 import rx.dagger.pseudo.presentation.CodeInput
 import rx.dagger.pseudo.presentation.FormButton
+import rx.dagger.pseudo.viewmodel.AddAccountViewModel
 
 @Composable
 fun CodeForm(
-    protoViewModel: Proto,
+    viewModel: AddAccountViewModel,
     onBackClick: (callback: () -> Unit) -> Unit
 ) {
     var code by remember { mutableStateOf("") }
-    var loading = protoViewModel.loading.collectAsState()
-    var error = protoViewModel.error.collectAsState()
+    val loading = viewModel.loadingSafe.collectAsState()
+    val error = viewModel.errorSafe.collectAsState()
 
     FormSkeleton(
         title = "+1 123 456789",
@@ -33,7 +34,7 @@ fun CodeForm(
             enabled = !loading.value,
             text =  "Продолжить",
             onClick = {
-                protoViewModel.sendCode(code)
+                viewModel.sendCode(code)
             }
         )
     }

@@ -5,37 +5,23 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import rx.dagger.pseudo.ui.theme.TelegramPseudoTheme
-import org.drinkless.tdlib.Client;
 import rx.dagger.pseudo.presentation.screens.AddAccountScreen
+import rx.dagger.pseudo.presentation.screens.HomeScreen
 import rx.dagger.pseudo.viewmodel.AddAccountViewModel
 import rx.dagger.pseudo.viewmodel.AddAccountViewModelFactory
+import rx.dagger.pseudo.viewmodel.HomeViewModel
+import rx.dagger.pseudo.viewmodel.HomeViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,16 +37,32 @@ class MainActivity : ComponentActivity() {
         val app = application as App
         val repo = app.telegramClientRepository
 
-        val viewModel: AddAccountViewModel by viewModels {
+        val addAccountViewModel: AddAccountViewModel by viewModels {
             AddAccountViewModelFactory(repo)
+        }
+
+        val homeViewModel: HomeViewModel by viewModels {
+            HomeViewModelFactory(repo)
         }
 
         enableEdgeToEdge()
         setContent {
+            val navController = rememberNavController()
+
             TelegramPseudoTheme(
                 darkTheme = true
             ) {
-                AddAccountScreen(viewModel)
+                NavHost(
+                    navController = navController,
+                    startDestination = Screens.Home
+                ) {
+                    composable<Screens.Home> {
+                        HomeScreen(homeViewModel)
+                    }
+                    composable<Screens.AddAccount> {
+                        AddAccountScreen(addAccountViewModel)
+                    }
+                }
             }
         }
     }
