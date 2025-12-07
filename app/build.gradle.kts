@@ -63,6 +63,7 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.2.0")
     val nav_version = "2.9.6"
     implementation("androidx.navigation:navigation-compose:${nav_version}")
+    implementation("io.coil-kt:coil-compose:2.4.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

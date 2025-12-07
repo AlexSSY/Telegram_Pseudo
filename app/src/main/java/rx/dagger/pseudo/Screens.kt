@@ -7,4 +7,6 @@ class Screens {
     object Home
     @Serializable
     object AddAccount
+    @Serializable
+    object Spam
 }

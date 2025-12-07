@@ -27,11 +27,10 @@ import rx.dagger.pseudo.viewmodel.AddAccountViewModel
 
 @Composable
 fun AddAccountScreen(
-    viewModel: AddAccountViewModel
+    viewModel: AddAccountViewModel,
+    onBackNavigation: () -> Unit
 ) {
-    var onBackClick: (() -> Unit)? = remember { null }
-    val protoViewModel = remember { Proto() }
-    val currentVisibility = protoViewModel.currentVisibility.collectAsState()
+    var onBackClick: (() -> Boolean)? = remember { null }
     val authorizationState = viewModel.telegramClient.authorizationState.collectAsState()
 
     Scaffold(
@@ -39,7 +38,8 @@ fun AddAccountScreen(
             AppTopBar(
                 title = "Добавить аккаунт",
                 onBackAction = {
-                    onBackClick?.invoke()
+                    if (onBackClick?.invoke() == true)
+                        onBackNavigation.invoke()
                 }
             )
         }

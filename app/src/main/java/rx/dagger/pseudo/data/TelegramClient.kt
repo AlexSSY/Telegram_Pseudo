@@ -37,6 +37,8 @@ class TelegramClient(
     private val authorizationStateFlow = MutableStateFlow<TdApi.AuthorizationState?>(null)
     val authorizationState = authorizationStateFlow.asStateFlow()
 
+    private var myAccountProfilePhotoId = ""
+
     private fun updateHandler(update: TdApi.Object) {
         when (update.constructor) {
             TdApi.UpdateAuthorizationState.CONSTRUCTOR -> {
@@ -44,10 +46,42 @@ class TelegramClient(
                     (update as TdApi.UpdateAuthorizationState).authorizationState
                 onAuthorizationStateUpdated(authorizationState)
             }
+
+            TdApi.UpdateFile.CONSTRUCTOR -> {
+                val downloaded = update as TdApi.UpdateFile
+                if (downloaded.file.local.isDownloadingCompleted) {
+                    if (myAccountProfilePhotoId == downloaded.file.remote.uniqueId) {
+                        profilePhotoPathFlow.value = downloaded.file.local.path
+                    }
+                }
+            }
+        }
+    }
+
+    private fun downloadFile(
+        file: TdApi.File
+    ) {
+        val request = TdApi.DownloadFile(
+            file.id,
+            32,
+            0,
+            0,
+            false
+        )
+
+        client.send(request) { obj ->
+            when (obj.constructor) {
+                TdApi.Error.CONSTRUCTOR -> {
+                    val message = (obj as TdApi.Error).message
+                    error("Download Profile Photo: $message")
+                }
+            }
         }
     }
 
     var onAuthorizedCallback: (() -> Unit)? = null
+    private val profilePhotoPathFlow = MutableStateFlow<String?>(null)
+    val profilePhotoPathSafe = profilePhotoPathFlow.asStateFlow()
 
     private fun onAuthorizationStateUpdated(authorizationState: TdApi.AuthorizationState) {
         authorizationStateFlow.value = authorizationState
@@ -82,6 +116,11 @@ class TelegramClient(
                             val firstName = me.firstName
                             val lastName = me.lastName
                             val phoneNumber = me.phoneNumber
+                            val photoFile = me.profilePhoto?.big
+                            if (photoFile != null) {
+                                myAccountProfilePhotoId = photoFile.remote.uniqueId
+                                downloadFile(photoFile)
+                            }
                             fullNameFlow.value = "$firstName $lastName".trim()
                             phoneNumberFlow.value = phoneNumber
                         }

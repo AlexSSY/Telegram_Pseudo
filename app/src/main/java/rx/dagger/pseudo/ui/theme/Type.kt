@@ -18,21 +18,21 @@ val Typography = Typography(
     titleLarge = TextStyle(
         fontFamily = OpenSans,
         fontWeight = FontWeight.Bold,
-        fontSize = 27.sp,
+        fontSize = 20.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
     labelMedium = TextStyle(
         fontFamily = OpenSans,
         fontWeight = FontWeight.Normal,
-        fontSize = 20.sp,
+        fontSize = 15.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
     labelSmall = TextStyle(
         fontFamily = OpenSans,
         fontWeight = FontWeight.Medium,
-        fontSize = 15.sp,
+        fontSize = 12.sp,
         lineHeight = 18.sp,
         letterSpacing = 0.5.sp
     )

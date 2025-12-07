@@ -19,11 +19,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import rx.dagger.pseudo.AppTopBar
+import rx.dagger.pseudo.presentation.TelegramClientListItem
 import rx.dagger.pseudo.viewmodel.HomeViewModel
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+    onNavigateToAddAccountScreen: () -> Unit,
+    onNavigateToSpamScreen: () -> Unit
 ) {
     val clients = viewModel.accountsSafe.collectAsState()
 
@@ -33,10 +36,10 @@ fun HomeScreen(
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                FloatingActionButton(onClick = { /* Handle FAB click */ }) {
-                    Icon(Icons.Filled.Email, "Add new item")
+                FloatingActionButton(onClick = { onNavigateToSpamScreen.invoke() }) {
+                    Icon(Icons.Filled.Email, "Send message")
                 }
-                FloatingActionButton(onClick = { /* Handle FAB click */ }) {
+                FloatingActionButton(onClick = { onNavigateToAddAccountScreen.invoke() }) {
                     Icon(Icons.Filled.Add, "Add new item")
                 }
             }
@@ -48,21 +51,9 @@ fun HomeScreen(
                 .padding(paddingValues)
         ) {
             items(clients.value.size) { idx ->
-                val client = clients.value[idx]
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    listOf<String>(
-                        client.authorizationState.value.toString().takeWhile { it != ' ' },
-                        client.phoneNumber.value ?: "loading ...",
-                        client.fullName.value ?: "loading ..."
-                    ).forEach { str ->
-                        Text(
-                            text = str,
-                            fontSize = 8.sp
-                        )
-                    }
-                }
+                TelegramClientListItem(
+                    clients.value[idx]
+                )
             }
         }
     }

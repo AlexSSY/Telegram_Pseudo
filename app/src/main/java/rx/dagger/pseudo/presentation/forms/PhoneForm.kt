@@ -30,7 +30,7 @@ import rx.dagger.pseudo.viewmodel.AddAccountViewModel
 @Composable
 fun PhoneForm(
     viewModel: AddAccountViewModel,
-    onBackClick: (callback: () -> Unit) -> Unit
+    onBackClick: (callback: () -> Boolean) -> Unit
 ) {
     var phoneCode by remember { mutableStateOf("380") }
     var phoneNumber by remember { mutableStateOf("") }
@@ -40,7 +40,12 @@ fun PhoneForm(
     val error = viewModel.errorSafe.collectAsState()
 
     onBackClick({
-        countrySelectOpened = false
+        if (countrySelectOpened) {
+            countrySelectOpened = false
+            return@onBackClick false
+        }
+
+        return@onBackClick true
     })
 
     FormSkeleton(

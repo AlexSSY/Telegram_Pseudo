@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun AppTopBar(
     title: String,
-    onBackAction: (() -> Unit)? = { }
+    onBackAction: (() -> Unit)? = null
 ) {
     if (onBackAction == null) {
         CenterAlignedTopAppBar(

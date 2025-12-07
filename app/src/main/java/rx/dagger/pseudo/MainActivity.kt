@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import rx.dagger.pseudo.ui.theme.TelegramPseudoTheme
 import rx.dagger.pseudo.presentation.screens.AddAccountScreen
 import rx.dagger.pseudo.presentation.screens.HomeScreen
+import rx.dagger.pseudo.presentation.screens.SpamScreen
 import rx.dagger.pseudo.viewmodel.AddAccountViewModel
 import rx.dagger.pseudo.viewmodel.AddAccountViewModelFactory
 import rx.dagger.pseudo.viewmodel.HomeViewModel
@@ -57,10 +58,30 @@ class MainActivity : ComponentActivity() {
                     startDestination = Screens.Home
                 ) {
                     composable<Screens.Home> {
-                        HomeScreen(homeViewModel)
+                        HomeScreen(
+                            homeViewModel,
+                            {
+                                navController.navigate(Screens.AddAccount)
+                            },
+                            {
+                                navController.navigate(Screens.Spam)
+                            }
+                        )
                     }
                     composable<Screens.AddAccount> {
-                        AddAccountScreen(addAccountViewModel)
+                        AddAccountScreen(
+                            addAccountViewModel,
+                            {
+                                navController.popBackStack()
+                            }
+                        )
+                    }
+                    composable<Screens.Spam> {
+                        SpamScreen(
+                            {
+                                navController.popBackStack()
+                            }
+                        )
                     }
                 }
             }

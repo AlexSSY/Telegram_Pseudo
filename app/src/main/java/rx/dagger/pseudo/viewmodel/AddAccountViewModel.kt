@@ -30,10 +30,33 @@ class AddAccountViewModel(
     }
 
     fun sendPhoneNumber(iso: String, number: String) {
+        // Pre-validation
+        if (iso.trim().isEmpty()) {
+            error.value = "country code is empty."
+            return
+        }
+
+        if (number.trim().isEmpty()) {
+            error.value = "phone number is empty."
+            return
+        }
+
+        val phoneNumber = (iso + number).trim()
+
         viewModelScope.launch {
             loading.value = true
             error.value = null
-            val result = telegramClient.sendPhoneNumber(iso + number)
+
+            // Check is number already added
+            if (telegramClientRepository.telegramClients.value.find({ client ->
+                client.phoneNumber.value == phoneNumber
+            }) != null) {
+                error.value = "already exists."
+                loading.value = false
+                return@launch
+            }
+
+            val result = telegramClient.sendPhoneNumber(phoneNumber)
             when (result) {
                 is TelegramResult.Failure -> {
                     when (result.error) {
